@@ -22,6 +22,8 @@
 
 ### 3rd Commit
 
+- I want to take the "High" column data from all 5 datasets and show the yearly average for years 1-5. Year 1 on the X-axis would be 1990, 1995, 2000, 2005, 2010. Year 5 would be the aggregated points of 1994, 1999, 2004, 2009, 2014. I want this visualization to be a new route while keeping the prior code the same.
+
 ### 4th Commit
 
 ### 5th Commit
