@@ -122,6 +122,72 @@ def highs_by_year_block():
         </html>
     '''
 
+@app.route('/lows_by_year_block')
+def lows_by_year_block():
+    import matplotlib.pyplot as plt
+    import io
+    import base64
+
+    # Ensure 'Date' is datetime in all DataFrames
+    for df in [df_90, df_95, df_00, df_05, df_10]:
+        df['Date'] = pd.to_datetime(df['Date'])
+
+    def get_yearly_avg_low(df, start_year):
+        df_filtered = df[(df['Date'].dt.year >= start_year) & (df['Date'].dt.year < start_year + 5)]
+        return df_filtered.groupby(df_filtered['Date'].dt.year)['Low'].mean()
+
+    # Get the 5 data series
+    avg_90 = get_yearly_avg_low(df_90, 1990)
+    avg_95 = get_yearly_avg_low(df_95, 1995)
+    avg_00 = get_yearly_avg_low(df_00, 2000)
+    avg_05 = get_yearly_avg_low(df_05, 2005)
+    avg_10 = get_yearly_avg_low(df_10, 2010)
+
+    # Build the aligned structure
+    x_labels = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5']
+    years = range(5)
+
+    # Convert to lists and align
+    lows_data = {
+        '1990-1994': avg_90.tolist(),
+        '1995-1999': avg_95.tolist(),
+        '2000-2004': avg_00.tolist(),
+        '2005-2009': avg_05.tolist(),
+        '2010-2014': avg_10.tolist(),
+    }
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    for label, values in lows_data.items():
+        if len(values) == 5:
+            plt.plot(x_labels, values, marker='o', label=label)
+
+    plt.title('Average "Low" Price Comparison Across 5-Year Blocks')
+    plt.xlabel('Year Within Block')
+    plt.ylabel('Average High Price')
+    plt.legend()
+    plt.grid(True)
+
+    # Convert plot to image
+    img = io.BytesIO()
+    plt.tight_layout()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+
+    return f'''
+        <html>
+        <head><title>High Price 5-Year Comparison</title></head>
+        <body>
+            <div style="text-align: center;">
+                <h1>Average "Low" Price Over 5-Year Windows</h1>
+                <img src="data:image/png;base64,{plot_url}" />
+            </div>
+        </body>
+        </html>
+    '''
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

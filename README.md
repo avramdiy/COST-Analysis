@@ -24,6 +24,14 @@
 
 - I want to take the "High" column data from all 5 datasets and show the yearly average for years 1-5. Year 1 on the X-axis would be 1990, 1995, 2000, 2005, 2010. Year 5 would be the aggregated points of 1994, 1999, 2004, 2009, 2014. I want this visualization to be a new route while keeping the prior code the same.
 
+- - Route Name /highs_by_year_block
+
 ### 4th Commit
+
+- I'd like to create a similar route to the 3rd commit, but represent the yearly average "Low" prices.
+
+- Route Name /lows_by_year_block
+
+- Unfortunately, the visual comparison of the Average High and the Average Low are nearly the same.
 
 ### 5th Commit
