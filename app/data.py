@@ -187,6 +187,77 @@ def lows_by_year_block():
         </html>
     '''
 
+@app.route('/projected_median_prices')
+def projected_median_prices():
+    import matplotlib.pyplot as plt
+    import io
+    import base64
+    import numpy as np
+
+    # Combine all historical dataframes
+    all_data = pd.concat([df_90, df_95, df_00, df_05, df_10])
+
+    # Make sure 'Date' is datetime
+    all_data['Date'] = pd.to_datetime(all_data['Date'])
+
+    # Calculate median for each day, then group by year and average
+    all_data['Median'] = (all_data['High'] + all_data['Low']) / 2
+    yearly_median = all_data.groupby(all_data['Date'].dt.year)['Median'].mean()
+
+    # Restrict to full historical range
+    historical_years = yearly_median[(yearly_median.index >= 1990) & (yearly_median.index <= 2015)]
+
+    # Simple linear trend extrapolation using numpy polyfit
+    years = historical_years.index.values
+    medians = historical_years.values
+    slope, intercept = np.polyfit(years, medians, 1)
+
+    future_years = np.arange(2026, 2032)
+    projected_medians = slope * future_years + intercept
+
+    # Fake current price of Costco (replace with API call in real app)
+    current_price = 880  # You can manually update this or integrate a stock API
+
+    # Plotting the projected medians
+    plt.figure(figsize=(8, 5))
+    plt.plot(future_years, projected_medians, marker='o', color='purple', label="Projected Median Price")
+    plt.axhline(current_price, color='gray', linestyle='--', label=f"Current Price (${current_price})")
+    plt.title("Projected Costco Median Price (2026–2031)")
+    plt.xlabel("Year")
+    plt.ylabel("Projected Median Price")
+    plt.grid(True)
+    plt.legend()
+
+    # Save plot to base64 image
+    img = io.BytesIO()
+    plt.tight_layout()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+
+    # Render as HTML
+    table_rows = ''.join([
+        f"<tr><td>{year}</td><td>${median:.2f}</td></tr>"
+        for year, median in zip(future_years, projected_medians)
+    ])
+
+    return f'''
+        <html>
+        <head><title>Projected Costco Median Prices</title></head>
+        <body>
+            <div style="text-align: center;">
+                <h1>Projected Costco Median Prices (2026–2031)</h1>
+                <img src="data:image/png;base64,{plot_url}" />
+                <h2>Projected Values</h2>
+                <table border="1" style="margin: 0 auto;">
+                    <tr><th>Year</th><th>Projected Median Price</th></tr>
+                    {table_rows}
+                </table>
+                <p style="margin-top: 1em; color: gray;">Current Costco Price: ${current_price}</p>
+            </div>
+        </body>
+        </html>
+    '''
 
 
 if __name__ == '__main__':

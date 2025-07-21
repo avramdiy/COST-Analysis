@@ -35,3 +35,9 @@
 - Unfortunately, the visual comparison of the Average High and the Average Low are nearly the same.
 
 ### 5th Commit
+
+- For the final commit, I want to take the yearly average "High" & "Low" prices, combine that with the current stock price of Costco, and calculate the yearly average median price from 2026 to 2031.
+
+- Route Name /projected_median_prices
+
+- The chart shows the median price to be much lower than the current price of $COST. Median price ranges from $132 to $152. The actual price of $COST is $950. Perhaps this price evaluation is not the wisest. 
